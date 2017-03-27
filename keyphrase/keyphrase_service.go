@@ -149,7 +149,7 @@ func (s service) Initialise() error {
 
 func createAnnotationRelationship() (statement string) {
 	stmt := `
-                MATCH (concept:Keyphrase{uuid:{conceptID}})
+                MERGE (concept:Thing{uuid:{conceptID}})
                 MERGE (content:Thing{uuid:{contentID}})
                 MERGE (ces:Identifier:CesIdentifier{value:{conceptID}})
                 MERGE (ces)-[:IDENTIFIES]->(concept)

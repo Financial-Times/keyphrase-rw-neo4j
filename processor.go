@@ -56,7 +56,7 @@ func processAnnotations(suggestion keyphrase.Suggestion, kps keyphrase.Service) 
 			if strings.Contains(annotationType, keyphraseOntology) {
 				fmt.Printf("Writing keyphrase annotation for %s\n", annotation.Thing.PrefLabel)
 				//TODO put these back into suggestions?
-				kps.Write(suggestion.Uuid, annotation)
+				go kps.Write(suggestion.Uuid, annotation)
 			}
 		}
 	}
