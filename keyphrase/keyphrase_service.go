@@ -12,7 +12,6 @@ import (
 )
 
 var lifecycle string = "keyphrase"
-var MENTIONS = "MENTIONS"
 var uuidExtractRegex = regexp.MustCompile(".*/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$")
 
 type service struct {
@@ -49,7 +48,7 @@ func (s service) Write(contentUUID string, thing interface{}) (error) {
 		return err
 	}
 
-	queries := append([]*neoism.CypherQuery{}, buildDeleteQuery(contentUUID, false))
+	//queries := append([]*neoism.CypherQuery{}, buildDeleteQuery(contentUUID, false))
 
 	var statements = []string{}
 
@@ -58,7 +57,7 @@ func (s service) Write(contentUUID string, thing interface{}) (error) {
 		return err
 	}
 	statements = append(statements, query.Statement)
-	queries = append(queries, query)
+	queries := append([]*neoism.CypherQuery{}, query)
 
 	log.Infof("Updated Annotations for content uuid: %s", contentUUID)
 	log.Debugf("For update, ran statements: %+v", statements)
