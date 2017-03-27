@@ -147,16 +147,16 @@ func (s service) Initialise() error {
 		"Keyphrase": 	  "uuid"})
 }
 
-func createAnnotationRelationship(relation string) (statement string) {
+func createAnnotationRelationship() (statement string) {
 	stmt := `
                 MATCH (concept:Keyphrase{uuid:{conceptID}})
                 MERGE (content:Thing{uuid:{contentID}})
                 MERGE (ces:Identifier:CesIdentifier{value:{conceptID}})
                 MERGE (ces)-[:IDENTIFIES]->(concept)
-                MERGE (content)-[pred:%s]->(concept)
+                MERGE (content)-[pred:MENTIONS]->(concept)
                 SET pred={annProps}
           `
-	statement = fmt.Sprintf(stmt, relation)
+	statement = fmt.Sprintf(stmt)
 	return statement
 }
 func (s service) createKeyphrase(thing Thing) (error) {
@@ -226,8 +226,7 @@ func createAnnotationQuery(contentUUID string, ann Annotation) (*neoism.CypherQu
 		}
 	}
 
-	relation := MENTIONS
-	query.Statement = createAnnotationRelationship(relation)
+	query.Statement = createAnnotationRelationship()
 	query.Parameters = map[string]interface{}{
 		"contentID":       contentUUID,
 		"conceptID":       thingID,
