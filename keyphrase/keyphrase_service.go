@@ -347,7 +347,7 @@ func (s service) GetPopular(timePeriod int) (interface{}, error) {
 			    WITH COUNT(DISTINCT a) as count, k, c
 			    WHERE c.publishedDateEpoch > {searchTime} AND k.prefLabel =~ '[a-z]*'
 			    WITH k.prefLabel as prefLabel, SUM(count) AS sum
-			    RETURN prefLabel, sum ORDER BY sum DESC LIMIT 1`,
+			    RETURN prefLabel, sum ORDER BY sum DESC LIMIT 25`,
 		Parameters: map[string]interface{}{
 			"searchTime": searchTime,
 		},
