@@ -313,7 +313,6 @@ func buildDeleteQuery(contentUUID string, includeStats bool) *neoism.CypherQuery
 
 func validateAnnotations(annotation Annotation) error {
 	//TODO - for consistency, we should probably just not create the annotation?
-	annotation.Thing.PrefLabel
 	if annotation.Thing.ID == "" {
 		return ValidationError{fmt.Sprintf("Concept uuid missing for annotation %+v", annotation)}
 	}
