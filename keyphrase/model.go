@@ -45,6 +45,6 @@ var relations = map[string]string{
 }
 
 type PopularKeyphrase struct {
-	Name string `json:"Label,omitempty"`
-	Count int   `json:"Count,omitempty"`
+	Name string `json:"prefLabel,omitempty"`
+	Count int   `json:"sum,omitempty"`
 }

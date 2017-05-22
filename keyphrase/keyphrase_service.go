@@ -336,7 +336,7 @@ func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
 }
 
 func (s service) GetPopular(timePeriod int) (interface{}, error) {
-	results := PopularKeyphrase{}
+	results := []PopularKeyphrase{}
 
 	searchTime := time.Now().Unix() - int64(timePeriod)
 
@@ -358,19 +358,19 @@ func (s service) GetPopular(timePeriod int) (interface{}, error) {
 
 	fmt.Printf("Read Query is %s\n", readQuery)
 
-	s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
+	err := s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
 	fmt.Printf("Results are %s\n", &results)
 
-	//if err != nil {
-	//	return Annotation{}, err
-	//}
-	//
-	//if len(results) == 0 {
-	//	return Annotation{}, nil
-	//}
+	if err != nil {
+		return Annotation{}, err
+	}
+
+	if len(results) == 0 {
+		return Annotation{}, nil
+	}
 
 
-	return results, nil
+	return results[0], nil
 }
 
 //func mapToResponseFormat(ann *annotation) {
