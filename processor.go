@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
-	"github.com/golang/go/src/pkg/fmt"
 )
 
 var keyphraseOntology = "http://www.ft.com/ontology/extraction/KeyPhrase"
@@ -54,8 +53,6 @@ func processAnnotations(suggestion keyphrase.Suggestion, kps keyphrase.Service) 
 	for _, annotation := range suggestion.Suggestions {
 		for _, annotationType := range annotation.Thing.Types {
 			if strings.Contains(annotationType, keyphraseOntology) {
-				fmt.Printf("Writing keyphrase annotation for %s\n", annotation.Thing.PrefLabel)
-				//TODO put these back into suggestions?
 				go kps.Write(suggestion.Uuid, annotation)
 			}
 		}

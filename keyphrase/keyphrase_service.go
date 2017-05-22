@@ -336,17 +336,21 @@ func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
 }
 
 func (s service) GetPopular(timePeriod int) (interface{}, error) {
-	results := []PopularKeyphrase{}
+	results := PopularKeyphrase{}
+
+	searchTime := time.Now().Unix() - int64(timePeriod)
+
+	fmt.Printf("Search time is %s\n", searchTime)
 
 	readQuery := &neoism.CypherQuery{
 		Statement: `MATCH (c:Content)-[a]->(k:Keyphrase)
 			    WITH COUNT(DISTINCT a) as count, k, c
-			    WHERE c.publishedDateEpoch > 86400 AND k.prefLabel =~ '[a-z]*'
+			    WHERE c.publishedDateEpoch > {searchTime} AND k.prefLabel =~ '[a-z]*'
 			    WITH k.prefLabel as prefLabel, SUM(count) AS sum
-			    RETURN prefLabel, sum ORDER BY sum DESC`,
-		//Parameters: map[string]interface{}{
-		//	"timePeriod": timePeriod,
-		//},
+			    RETURN prefLabel, sum ORDER BY sum DESC LIMIT 1`,
+		Parameters: map[string]interface{}{
+			"searchTime": searchTime,
+		},
 		Result: &results,
 	}
 
@@ -354,19 +358,19 @@ func (s service) GetPopular(timePeriod int) (interface{}, error) {
 
 	fmt.Printf("Read Query is %s\n", readQuery)
 
-	err := s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
+	s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
 	fmt.Printf("Results are %s\n", &results)
 
-	if err != nil {
-		return Annotation{}, err
-	}
+	//if err != nil {
+	//	return Annotation{}, err
+	//}
+	//
+	//if len(results) == 0 {
+	//	return Annotation{}, nil
+	//}
 
-	if len(results) == 0 {
-		return Annotation{}, nil
-	}
 
-
-	return results[0], nil
+	return results, nil
 }
 
 //func mapToResponseFormat(ann *annotation) {
