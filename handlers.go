@@ -190,15 +190,65 @@ func (hh *keyphraseHandlers) GetPopularDay(w http.ResponseWriter, r *http.Reques
 		writeJSONError(w, msg, http.StatusServiceUnavailable)
 		return
 	}
-	//if !found {
-	//	writeJSONError(w, fmt.Sprintf("No annotations found for content with uuid %s.", uuid), http.StatusNotFound)
-	//	return
-	//}
-	//Jason, _ := json.Marshal(annotations)
-	//log.Debugf("Annotations for content (uuid:%s): %s\n", Jason)
-	//w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	//w.WriteHeader(http.StatusOK)
-	//json.NewEncoder(w).Encode(annotations)
+	Jason, _ := json.Marshal(statistics)
+	log.Debugf("Annotations for content (uuid:%s): %s\n", Jason)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(statistics)
+}
+
+func (hh *keyphraseHandlers) GetPopularWeek(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	statistics, err := hh.keyphraseDriver.GetPopular(ONE_WEEK_AGO)
+	fmt.Printf("Result is %s\n", statistics)
+	if err != nil {
+		msg := fmt.Sprintf("Error getting annotations (%v)", err)
+		log.Error(msg)
+		writeJSONError(w, msg, http.StatusServiceUnavailable)
+		return
+	}
+	Jason, _ := json.Marshal(statistics)
+	log.Debugf("Annotations for content (uuid:%s): %s\n", Jason)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(statistics)
+}
+
+func (hh *keyphraseHandlers) GetPopularMonth(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	statistics, err := hh.keyphraseDriver.GetPopular(ONE_MONTH_AGO)
+	fmt.Printf("Result is %s\n", statistics)
+	if err != nil {
+		msg := fmt.Sprintf("Error getting annotations (%v)", err)
+		log.Error(msg)
+		writeJSONError(w, msg, http.StatusServiceUnavailable)
+		return
+	}
+	Jason, _ := json.Marshal(statistics)
+	log.Debugf("Annotations for content (uuid:%s): %s\n", Jason)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(statistics)
+}
+
+func (hh *keyphraseHandlers) GetPopularSixMonths(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	statistics, err := hh.keyphraseDriver.GetPopular(SIX_MONTHS_AGO)
+	fmt.Printf("Result is %s\n", statistics)
+	if err != nil {
+		msg := fmt.Sprintf("Error getting annotations (%v)", err)
+		log.Error(msg)
+		writeJSONError(w, msg, http.StatusServiceUnavailable)
+		return
+	}
+	Jason, _ := json.Marshal(statistics)
+	log.Debugf("Annotations for content (uuid:%s): %s\n", Jason)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(statistics)
 }
 
 // DeleteAnnotations will delete all the annotations for a piece of content

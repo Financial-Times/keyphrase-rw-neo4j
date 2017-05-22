@@ -190,9 +190,9 @@ func router(handlers keyphraseHandlers) http.Handler {
 	serviceRouter.HandleFunc("/content/{uuid}/keyphrase/annotations", handlers.DeleteAnnotations).Methods("DELETE")
 	serviceRouter.HandleFunc("/content/keyphrase/annotations/__count", handlers.CountAnnotations).Methods("GET")
 	serviceRouter.HandleFunc("/highlights/day", handlers.GetPopularDay).Methods("GET")
-	//serviceRouter.HandleFunc("/highlights/week", handlers.GetPopularWeek).Methods("GET")
-	//serviceRouter.HandleFunc("/highlights/month", handlers.GetPopularMonth).Methods("GET")
-	//serviceRouter.HandleFunc("/highlights/sixmonths", handlers.GetPopularSixMonths).Methods("GET")
+	serviceRouter.HandleFunc("/highlights/week", handlers.GetPopularWeek).Methods("GET")
+	serviceRouter.HandleFunc("/highlights/month", handlers.GetPopularMonth).Methods("GET")
+	serviceRouter.HandleFunc("/highlights/sixmonths", handlers.GetPopularSixMonths).Methods("GET")
 
 	var monitoringRouter http.Handler = serviceRouter
 	monitoringRouter = httphandlers.TransactionAwareRequestLoggingHandler(log.StandardLogger(), monitoringRouter)
