@@ -6,18 +6,15 @@ type Suggestion struct {
 	Suggestions annotations  `json:"suggestions"`
 	Uuid string		  `json:"uuid"`
 }
-//TODO Not sure this is right...
 //Annotation is the main struct used to create and return structures
 type Annotation struct {
 	Thing       Thing        `json:"thing,omitempty"`
 	Provenances []provenance `json:"provenances,omitempty"`
 }
 
-//TODO had to make public to be accessible to processor.Go should move processor? or public is cool?
 //Thing represents a concept being linked to
 type Thing struct {
 	ID        string   `json:"id,omitempty"`
-	//TODO prefLabel can be different dependinng upon context. Delete and re-write for now. possible label list in the future?
 	PrefLabel string   `json:"prefLabel,omitempty"`
 	Types     []string `json:"types,omitempty"`
 	Predicate string   `json:"predicate,omitempty"`
@@ -43,6 +40,11 @@ const (
 	confidenceScoringSystem = "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM"
 )
 
-var relations = map[string]string{ //TODO what predicate?
+var relations = map[string]string{
 	"mentions":                "MENTIONS",
+}
+
+type PopularKeyphrase struct {
+	Name string `json:"Label,omitempty"`
+	Count int   `json:"Count,omitempty"`
 }

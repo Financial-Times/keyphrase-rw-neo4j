@@ -16,9 +16,17 @@ import (
 	"github.com/Financial-Times/keyphrase-rw-neo4j/keyphrase"
 )
 
+const (
+	YESTERDAY = 86400
+	ONE_WEEK_AGO = 604800
+	ONE_MONTH_AGO = 2629743
+	SIX_MONTHS_AGO = 6 * ONE_MONTH_AGO
+)
+
 type keyphraseHandlers struct {
 	keyphraseDriver keyphrase.Service
 	vulcanAddr      string
+	timePeriod 	string
 }
 
 func (hh *keyphraseHandlers) kafkaProxyHealthCheck() v1a.Check {
@@ -168,6 +176,29 @@ func (hh *keyphraseHandlers) GetAnnotations(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(annotations)
+}
+
+//
+func (hh *keyphraseHandlers) GetPopularDay(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	statistics, err := hh.keyphraseDriver.GetPopular(YESTERDAY)
+	fmt.Printf("Result is %s\n", statistics)
+	if err != nil {
+		msg := fmt.Sprintf("Error getting annotations (%v)", err)
+		log.Error(msg)
+		writeJSONError(w, msg, http.StatusServiceUnavailable)
+		return
+	}
+	//if !found {
+	//	writeJSONError(w, fmt.Sprintf("No annotations found for content with uuid %s.", uuid), http.StatusNotFound)
+	//	return
+	//}
+	//Jason, _ := json.Marshal(annotations)
+	//log.Debugf("Annotations for content (uuid:%s): %s\n", Jason)
+	//w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	//w.WriteHeader(http.StatusOK)
+	//json.NewEncoder(w).Encode(annotations)
 }
 
 // DeleteAnnotations will delete all the annotations for a piece of content

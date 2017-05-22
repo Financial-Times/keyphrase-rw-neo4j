@@ -30,6 +30,7 @@ type Service interface {
 	Count() (int, error)
 	DecodeJSON(dec *json.Decoder) (interface{}, string, error)
 	Initialise() error
+	GetPopular(timePeriod int) (thing interface{}, err error)
 }
 
 func (s service) Write(contentUUID string, thing interface{}) (error) {
@@ -312,6 +313,7 @@ func buildDeleteQuery(contentUUID string, includeStats bool) *neoism.CypherQuery
 
 func validateAnnotations(annotation Annotation) error {
 	//TODO - for consistency, we should probably just not create the annotation?
+	annotation.Thing.PrefLabel
 	if annotation.Thing.ID == "" {
 		return ValidationError{fmt.Sprintf("Concept uuid missing for annotation %+v", annotation)}
 	}
@@ -332,6 +334,38 @@ func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
 	ann := Annotation{}
 	err := dec.Decode(&ann)
 	return ann, "", err
+}
+
+func (s service) GetPopular(timePeriod int) (interface{}, error) {
+	results := []PopularKeyphrase{}
+
+	readQuery := &neoism.CypherQuery{
+		Statement: `MATCH (c:Content)-[a]->(k:Keyphrase)
+			    WITH COUNT(DISTINCT a) as count, k, c
+			    WHERE c.publishedDateEpoch > {timePeriod} AND k.prefLabel =~ '[a-z]*'
+			    WITH k.prefLabel as prefLabel, SUM(count) AS sum
+			    RETURN prefLabel, sum ORDER BY sum DESC`,
+		Parameters: map[string]interface{}{
+			"timePeriod": timePeriod,
+		},
+		Result: &results,
+	}
+
+	fmt.Printf("Result is %s\n", &results)
+
+	err := s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
+	fmt.Printf("Result is %s\n", &results)
+
+	if err != nil {
+		return Annotation{}, err
+	}
+
+	if len(results) == 0 {
+		return Annotation{}, nil
+	}
+
+
+	return results[0], nil
 }
 
 //func mapToResponseFormat(ann *annotation) {
