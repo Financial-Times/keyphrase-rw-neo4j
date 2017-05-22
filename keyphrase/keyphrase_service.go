@@ -342,12 +342,12 @@ func (s service) GetPopular(timePeriod int) (interface{}, error) {
 	readQuery := &neoism.CypherQuery{
 		Statement: `MATCH (c:Content)-[a]->(k:Keyphrase)
 			    WITH COUNT(DISTINCT a) as count, k, c
-			    WHERE c.publishedDateEpoch > {timePeriod} AND k.prefLabel =~ '[a-z]*'
+			    WHERE c.publishedDateEpoch > 86400 AND k.prefLabel =~ '[a-z]*'
 			    WITH k.prefLabel as prefLabel, SUM(count) AS sum
 			    RETURN prefLabel, sum ORDER BY sum DESC`,
-		Parameters: map[string]interface{}{
-			"timePeriod": strconv.Itoa(timePeriod),
-		},
+		//Parameters: map[string]interface{}{
+		//	"timePeriod": timePeriod,
+		//},
 		Result: &results,
 	}
 
