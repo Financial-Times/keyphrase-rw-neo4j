@@ -9,6 +9,7 @@ import (
 	"time"
 	"regexp"
 	"encoding/json"
+	"strconv"
 )
 
 var lifecycle string = "keyphrase"
@@ -345,15 +346,17 @@ func (s service) GetPopular(timePeriod int) (interface{}, error) {
 			    WITH k.prefLabel as prefLabel, SUM(count) AS sum
 			    RETURN prefLabel, sum ORDER BY sum DESC`,
 		Parameters: map[string]interface{}{
-			"timePeriod": timePeriod,
+			"timePeriod": strconv.Itoa(timePeriod),
 		},
 		Result: &results,
 	}
 
 	fmt.Printf("Result is %s\n", &results)
 
+	fmt.Printf("Read Query is %s\n", readQuery)
+
 	err := s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
-	fmt.Printf("Result is %s\n", &results)
+	fmt.Printf("Results are %s\n", &results)
 
 	if err != nil {
 		return Annotation{}, err
