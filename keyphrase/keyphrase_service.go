@@ -9,7 +9,6 @@ import (
 	"time"
 	"regexp"
 	"encoding/json"
-	"strconv"
 )
 
 var lifecycle string = "keyphrase"
