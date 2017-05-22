@@ -30,7 +30,7 @@ type Service interface {
 	Count() (int, error)
 	DecodeJSON(dec *json.Decoder) (interface{}, string, error)
 	Initialise() error
-	GetPopular(timePeriod int) (thing interface{}, err error)
+	GetPopular(timePeriod int) (thing []interface{}, err error)
 }
 
 func (s service) Write(contentUUID string, thing interface{}) (error) {
@@ -335,7 +335,7 @@ func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
 	return ann, "", err
 }
 
-func (s service) GetPopular(timePeriod int) (interface{}, error) {
+func (s service) GetPopular(timePeriod int) ([]interface{}, error) {
 	results := []PopularKeyphrase{}
 
 	searchTime := time.Now().Unix() - int64(timePeriod)
@@ -370,7 +370,7 @@ func (s service) GetPopular(timePeriod int) (interface{}, error) {
 	}
 
 
-	return results[0], nil
+	return results, nil
 }
 
 //func mapToResponseFormat(ann *annotation) {
