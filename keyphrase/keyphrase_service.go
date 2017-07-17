@@ -375,7 +375,7 @@ func (s service) GetCoOccurrence(keyphraseUUID string, transID string, limit int
 
 	readQuery := &neoism.CypherQuery{
 		Statement: `MATCH (k:Keyphrase{uuid:{uuid}})-[keyRel]-(c:Content)-[occRel]-(x:Concept)
-		WITH COUNT(DISTINCT occRel) AS cooccurrance, x
+		WITH COUNT(DISTINCT occRel) AS cooccurrence, x
 		RETURN cooccurrence, x.uuid as ConceptUUID, labels(x) as ConceptTypes, x.prefLabel as ConceptLabel
 		ORDER BY cooccurrence DESC LIMIT {limit}`,
 		Parameters: map[string]interface{}{
