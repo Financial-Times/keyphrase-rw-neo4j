@@ -346,7 +346,7 @@ func (s service) GetPopular(timePeriod int) ([]PopularKeyphrase, error) {
 		Statement: `MATCH (c:Content)-[a]->(k:Keyphrase)
 			    WITH COUNT(DISTINCT a) as count, k, c
 			    WHERE c.publishedDateEpoch > {searchTime} AND k.prefLabel =~ '[a-z]*'
-			    WITH k.prefLabel as keyphrase, k.uuid as keyphaseId, SUM(count) AS count
+			    WITH k.prefLabel as keyphrase, k.uuid as keyphraseId, SUM(count) AS count
 			    RETURN keyphrase, keyphraseId, count ORDER BY count DESC LIMIT 25`,
 		Parameters: map[string]interface{}{
 			"searchTime": searchTime,
