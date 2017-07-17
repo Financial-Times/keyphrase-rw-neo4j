@@ -46,6 +46,7 @@ var relations = map[string]string{
 
 type PopularKeyphrase struct {
 	Name string `json:"keyphrase,omitempty"`
+	UUID string `json:"keyphraseId,omitempty"`
 	Count int   `json:"count,omitempty"`
 }
 
