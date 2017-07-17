@@ -166,7 +166,7 @@ func (s service) createKeyphrase(thing Thing) (error) {
 
 	deletePreviousDetailsQuery := &neoism.CypherQuery{
 		Statement: `MATCH (t:Thing {uuid:{uuid}})
-		REMOVE t:Keyphrase
+		REMOVE t:Concept:Keyphrase
 		SET t.uuid={uuid}`,
 		Parameters: map[string]interface{}{
 			"uuid": keyphraseId,
@@ -374,8 +374,8 @@ func (s service) GetCoOccurrence(keyphraseUUID string, transID string, limit int
 
 	readQuery := &neoism.CypherQuery{
 		Statement: `MATCH (k:Keyphrase{uuid:{uuid}})-[keyRel]-(c:Content)-[occRel]-(x:Concept)
-		WITH COUNT(DISTINCT occRel) AS cooccurrence, x
-		RETURN cooccurrence, x.uuid as ConceptUUID, labels(x) as ConceptTypes, x.prefLabel as ConceptLabel
+		WITH COUNT(DISTINCT occRel) AS cooccurrence, x, k
+		RETURN k.prefLabel as keyphraseLabel, cooccurrence, x.uuid as ConceptUUID, labels(x) as ConceptTypes, x.prefLabel as ConceptLabel
 		ORDER BY cooccurrence DESC LIMIT {limit}`,
 		Parameters: map[string]interface{}{
 			"uuid": keyphraseUUID,
@@ -396,7 +396,7 @@ func (s service) GetCoOccurrence(keyphraseUUID string, transID string, limit int
 
 	queryResults := CoOccurrences{}
 	queryResults.KeyphraseUUID = keyphraseUUID
-	queryResults.KeyphraseLabel = "Keyphrase Label"
+	queryResults.KeyphraseLabel = results[0].KeyphraseLabel
 	queryResults.CoOccurrences = results
 
 	//results[0].ConceptDirectType = mapper.MostSpecificType(results[0].ConceptTypes)[0]

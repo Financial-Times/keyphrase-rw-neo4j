@@ -55,6 +55,7 @@ type CoOccurrence struct {
 	ConceptTypes []string `json:"conceptTypes,omitempty`
 	ConceptDirectType string `json:"conceptType,omitempty`
 	ConceptUUID string `json:"conceptId,omitempty"`
+	KeyphraseLabel string `json:"keyphraseLabel,omitempty"`
 }
 
 type CoOccurrences struct {
