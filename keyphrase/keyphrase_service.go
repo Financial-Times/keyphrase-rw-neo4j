@@ -9,6 +9,7 @@ import (
 	"time"
 	"regexp"
 	"encoding/json"
+	"github.com/Financial-Times/neo-model-utils-go/mapper"
 )
 
 var lifecycle string = "keyphrase"
@@ -31,6 +32,7 @@ type Service interface {
 	DecodeJSON(dec *json.Decoder) (interface{}, string, error)
 	Initialise() error
 	GetPopular(timePeriod int) (thing []PopularKeyphrase, err error)
+	GetCoOccurrence(keyphraseUUID string, transID string, limit string) (thing interface{}, found bool, err error)
 }
 
 func (s service) Write(contentUUID string, thing interface{}) (error) {
@@ -328,7 +330,6 @@ func (v ValidationError) Error() string {
 	return v.Msg
 }
 
-
 func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
 	ann := Annotation{}
 	err := dec.Decode(&ann)
@@ -346,20 +347,15 @@ func (s service) GetPopular(timePeriod int) ([]PopularKeyphrase, error) {
 		Statement: `MATCH (c:Content)-[a]->(k:Keyphrase)
 			    WITH COUNT(DISTINCT a) as count, k, c
 			    WHERE c.publishedDateEpoch > {searchTime} AND k.prefLabel =~ '[a-z]*'
-			    WITH k.prefLabel as prefLabel, SUM(count) AS sum
-			    RETURN prefLabel, sum ORDER BY sum DESC LIMIT 25`,
+			    WITH k.prefLabel as keyphrase, SUM(count) AS count
+			    RETURN keyphrase, count ORDER BY count DESC LIMIT 25`,
 		Parameters: map[string]interface{}{
 			"searchTime": searchTime,
 		},
 		Result: &results,
 	}
 
-	fmt.Printf("Result is %s\n", &results)
-
-	fmt.Printf("Read Query is %s\n", readQuery)
-
 	err := s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
-	fmt.Printf("Results are %s\n", &results)
 
 	if err != nil {
 		return []PopularKeyphrase{}, err
@@ -373,6 +369,51 @@ func (s service) GetPopular(timePeriod int) ([]PopularKeyphrase, error) {
 	return results, nil
 }
 
+
+func (s service) GetCoOccurrence(keyphraseUUID string, transID string, limit string) (interface{}, bool, error) {
+	results := []CoOccurrence{}
+
+	readQuery := &neoism.CypherQuery{
+		Statement: `MATCH (k:Keyphrase{uuid:{uuid}})-[keyRel]-(c:Content)-[occRel]-(x:Concept)
+		WITH COUNT(DISTINCT occRel) AS cooccurrance, x
+		RETURN cooccurrance, x.uuid as ConceptUUID, labels(x) as ConceptTypes, x.prefLabel as ConceptLabel
+		ORDER BY cooccurrance DESC LIMIT {limit}`,
+		Parameters: map[string]interface{}{
+			"uuid": keyphraseUUID,
+			"limit": limit,
+		},
+		Result: &results,
+	}
+
+	err := s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
+
+	for _, result := range results {
+		result.ConceptDirectType, err = mapper.MostSpecificType(result.ConceptTypes)
+		if err != nil {
+			log.WithFields(log.Fields{"UUID": keyphraseUUID, "transaction_id":"tid"}).Debug("Invalid concept type found")
+			return CoOccurrence{}, false, err
+		}
+	}
+
+	queryResults := CoOccurrences{}
+	queryResults.KeyphraseUUID = keyphraseUUID
+	queryResults.KeyphraseLabel = "Keyphrase Label"
+	queryResults.CoOccurrences = results
+
+	//results[0].ConceptDirectType = mapper.MostSpecificType(results[0].ConceptTypes)[0]
+	//results[0].ConceptTypes = []string{}
+
+	if err != nil {
+		return CoOccurrence{}, false, err
+	}
+
+	if len(results) == 0 {
+		return CoOccurrence{}, false, nil
+	}
+
+
+	return queryResults, true, nil
+}
 //func mapToResponseFormat(ann *annotation) {
 //	ann.Thing.ID = mapper.IDURL(ann.Thing.ID)
 //	// We expect only ONE provenance - provenance value is considered valid even if the AgentRole is not specified. See: v1 - isClassifiedBy

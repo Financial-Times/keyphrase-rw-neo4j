@@ -14,6 +14,9 @@ import (
 	"github.com/gorilla/mux"
 	"encoding/json"
 	"github.com/Financial-Times/keyphrase-rw-neo4j/keyphrase"
+	"net/url"
+	"strconv"
+	"github.com/Financial-Times/transactionid-utils-go"
 )
 
 const (
@@ -183,7 +186,6 @@ func (hh *keyphraseHandlers) GetPopularDay(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	statistics, err := hh.keyphraseDriver.GetPopular(YESTERDAY)
-	fmt.Printf("Result is %s\n", statistics)
 	if err != nil {
 		msg := fmt.Sprintf("Error getting annotations (%v)", err)
 		log.Error(msg)
@@ -249,6 +251,41 @@ func (hh *keyphraseHandlers) GetPopularSixMonths(w http.ResponseWriter, r *http.
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(statistics)
+}
+
+func (hh *keyphraseHandlers) GetCoOccurrences(w http.ResponseWriter, r *http.Request) {
+	url, _ := url.ParseQuery(r.URL.RawQuery)
+
+	limit := url.Get("limit")
+	limitINT, err := strconv.Atoi(limit)
+	if limit == "" || limitINT >= 100 {
+		limit = "25"
+	}
+	transID := transactionidutils.GetTransactionIDFromRequest(r)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("X-Request-Id", transID)
+
+	vars := mux.Vars(r)
+	keyphraseId := vars["uuid"]
+
+	if keyphraseId == "" {
+		writeJSONError(w, "uuid required", http.StatusBadRequest)
+		return
+	}
+
+	data, found, err := hh.keyphraseDriver.GetCoOccurrence(keyphraseId, transID, limit)
+	if err != nil {
+		msg := fmt.Sprintf("Error getting annotations (%v)", err)
+		log.Error(msg)
+		writeJSONError(w, msg, http.StatusServiceUnavailable)
+		return
+	}
+	if !found {
+		writeJSONError(w, fmt.Sprintf("No co-occurrences found for keyphrase with uuid %s.", keyphraseId), http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(data)
 }
 
 // DeleteAnnotations will delete all the annotations for a piece of content

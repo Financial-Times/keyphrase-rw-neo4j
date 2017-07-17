@@ -45,6 +45,20 @@ var relations = map[string]string{
 }
 
 type PopularKeyphrase struct {
-	Name string `json:"prefLabel,omitempty"`
-	Count int   `json:"sum,omitempty"`
+	Name string `json:"keyphrase,omitempty"`
+	Count int   `json:"count,omitempty"`
+}
+
+type CoOccurrence struct {
+	CoOccurranceCount int `json:"cooccurrance,omitempty"`
+	ConceptLabel string `json:"conceptLabel,omitempty"`
+	ConceptTypes []string `json:"conceptTypes,omitempty`
+	ConceptDirectType string `json:"conceptType,omitempty`
+	ConceptUUID string `json:"conceptId,omitempty"`
+}
+
+type CoOccurrences struct {
+	KeyphraseLabel string `json:"keyphraseLabel,omitempty"`
+	KeyphraseUUID string `json:"keyphraseUuid,omitempty"`
+	CoOccurrences []CoOccurrence `json:"coOccurrences,omitempty"`
 }
