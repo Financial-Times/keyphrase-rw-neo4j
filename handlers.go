@@ -16,6 +16,7 @@ import (
 	"github.com/Financial-Times/keyphrase-rw-neo4j/keyphrase"
 	"net/url"
 	"github.com/Financial-Times/transactionid-utils-go"
+	"github.com/golang/go/src/pkg/strconv"
 )
 
 const (
@@ -255,9 +256,12 @@ func (hh *keyphraseHandlers) GetPopularSixMonths(w http.ResponseWriter, r *http.
 func (hh *keyphraseHandlers) GetCoOccurrences(w http.ResponseWriter, r *http.Request) {
 	url, _ := url.ParseQuery(r.URL.RawQuery)
 
+	var limitInt int
 	limit := url.Get("limit")
 	if limit == "" {
-		limit = "25"
+		limitInt = 25
+	} else {
+		limitInt, _ = strconv.Atoi(limit)
 	}
 	transID := transactionidutils.GetTransactionIDFromRequest(r)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -271,7 +275,7 @@ func (hh *keyphraseHandlers) GetCoOccurrences(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	data, found, err := hh.keyphraseDriver.GetCoOccurrence(keyphraseId, transID, limit)
+	data, found, err := hh.keyphraseDriver.GetCoOccurrence(keyphraseId, transID, limitInt)
 	if err != nil {
 		msg := fmt.Sprintf("Error getting annotations (%v)", err)
 		log.Error(msg)

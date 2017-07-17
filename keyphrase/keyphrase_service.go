@@ -32,7 +32,7 @@ type Service interface {
 	DecodeJSON(dec *json.Decoder) (interface{}, string, error)
 	Initialise() error
 	GetPopular(timePeriod int) (thing []PopularKeyphrase, err error)
-	GetCoOccurrence(keyphraseUUID string, transID string, limit string) (thing interface{}, found bool, err error)
+	GetCoOccurrence(keyphraseUUID string, transID string, limit int) (thing interface{}, found bool, err error)
 }
 
 func (s service) Write(contentUUID string, thing interface{}) (error) {
@@ -370,14 +370,14 @@ func (s service) GetPopular(timePeriod int) ([]PopularKeyphrase, error) {
 }
 
 
-func (s service) GetCoOccurrence(keyphraseUUID string, transID string, limit string) (interface{}, bool, error) {
+func (s service) GetCoOccurrence(keyphraseUUID string, transID string, limit int) (interface{}, bool, error) {
 	results := []CoOccurrence{}
 
 	readQuery := &neoism.CypherQuery{
 		Statement: `MATCH (k:Keyphrase{uuid:{uuid}})-[keyRel]-(c:Content)-[occRel]-(x:Concept)
 		WITH COUNT(DISTINCT occRel) AS cooccurrance, x
-		RETURN cooccurrance, x.uuid as ConceptUUID, labels(x) as ConceptTypes, x.prefLabel as ConceptLabel
-		ORDER BY cooccurrance DESC LIMIT {limit}`,
+		RETURN cooccurrence, x.uuid as ConceptUUID, labels(x) as ConceptTypes, x.prefLabel as ConceptLabel
+		ORDER BY cooccurrence DESC LIMIT {limit}`,
 		Parameters: map[string]interface{}{
 			"uuid": keyphraseUUID,
 			"limit": limit,
