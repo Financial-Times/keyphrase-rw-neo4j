@@ -387,13 +387,13 @@ func (s service) GetCoOccurrence(keyphraseUUID string, transID string, limit int
 
 	err := s.conn.CypherBatch([]*neoism.CypherQuery{readQuery})
 
-	for _, result := range results {
-		result.ConceptDirectType, err = mapper.MostSpecificType(result.ConceptTypes)
-		if err != nil {
-			log.WithFields(log.Fields{"UUID": keyphraseUUID, "transaction_id":"tid"}).Debug("Invalid concept type found")
-			return CoOccurrence{}, false, err
-		}
-	}
+	//for _, result := range results {
+	//	result.ConceptDirectType, err = mapper.MostSpecificType(result.ConceptTypes)
+	//	if err != nil {
+	//		log.WithFields(log.Fields{"UUID": keyphraseUUID, "transaction_id":"tid"}).Debug("Invalid concept type found")
+	//		return CoOccurrence{}, false, err
+	//	}
+	//}
 
 	queryResults := CoOccurrences{}
 	queryResults.KeyphraseUUID = keyphraseUUID
