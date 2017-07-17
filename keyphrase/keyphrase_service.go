@@ -166,7 +166,7 @@ func (s service) createKeyphrase(thing Thing) (error) {
 
 	deletePreviousDetailsQuery := &neoism.CypherQuery{
 		Statement: `MATCH (t:Thing {uuid:{uuid}})
-		REMOVE t:Concept:Keyphrase
+		REMOVE t:Keyphrase
 		SET t.uuid={uuid}`,
 		Parameters: map[string]interface{}{
 			"uuid": keyphraseId,
