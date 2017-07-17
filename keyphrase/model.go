@@ -51,7 +51,7 @@ type PopularKeyphrase struct {
 }
 
 type CoOccurrence struct {
-	CoOccurranceCount string `json:"cooccurrence,omitempty"`
+	CoOccurranceCount int `json:"cooccurrence,omitempty"`
 	ConceptLabel string `json:"conceptLabel,omitempty"`
 	ConceptTypes []string `json:"conceptTypes,omitempty`
 	ConceptDirectType string `json:"conceptType,omitempty`
