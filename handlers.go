@@ -15,7 +15,6 @@ import (
 	"encoding/json"
 	"github.com/Financial-Times/keyphrase-rw-neo4j/keyphrase"
 	"net/url"
-	"strconv"
 	"github.com/Financial-Times/transactionid-utils-go"
 )
 
@@ -257,8 +256,7 @@ func (hh *keyphraseHandlers) GetCoOccurrences(w http.ResponseWriter, r *http.Req
 	url, _ := url.ParseQuery(r.URL.RawQuery)
 
 	limit := url.Get("limit")
-	limitINT, err := strconv.Atoi(limit)
-	if limit == "" || limitINT >= 100 {
+	if limit == "" {
 		limit = "25"
 	}
 	transID := transactionidutils.GetTransactionIDFromRequest(r)

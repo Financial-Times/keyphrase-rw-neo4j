@@ -193,7 +193,7 @@ func router(handlers keyphraseHandlers) http.Handler {
 	serviceRouter.HandleFunc("/highlights/week", handlers.GetPopularWeek).Methods("GET")
 	serviceRouter.HandleFunc("/highlights/month", handlers.GetPopularMonth).Methods("GET")
 	serviceRouter.HandleFunc("/highlights/sixmonths", handlers.GetPopularSixMonths).Methods("GET")
-	serviceRouter.HandleFunc("/cooccurance/{uuid}", handlers.GetCoOccurrences).Methods("GET")
+	serviceRouter.HandleFunc("/cooccurrence/{uuid}", handlers.GetCoOccurrences).Methods("GET")
 
 	var monitoringRouter http.Handler = serviceRouter
 	monitoringRouter = httphandlers.TransactionAwareRequestLoggingHandler(log.StandardLogger(), monitoringRouter)

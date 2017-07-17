@@ -62,7 +62,7 @@ func (s service) Write(contentUUID string, thing interface{}) (error) {
 	statements = append(statements, query.Statement)
 	queries := append([]*neoism.CypherQuery{}, query)
 
-	log.Infof("Updated Annotations for content uuid: %s", contentUUID)
+	log.Debugf("Updated Annotations for content uuid: %s", contentUUID)
 	log.Debugf("For update, ran statements: %+v", statements)
 
 	return s.conn.CypherBatch(queries)
