@@ -9,7 +9,6 @@ import (
 	"time"
 	"regexp"
 	"encoding/json"
-	"github.com/Financial-Times/neo-model-utils-go/mapper"
 )
 
 var lifecycle string = "keyphrase"
